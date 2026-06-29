@@ -1,0 +1,20 @@
+{
+  "name": "com.exerussus.payloads",
+  "version": "1.0.0",
+  "displayName": "Payloads",
+  "description": "Реализация payload на long.",
+  "unity": "2020.3",
+  "dependencies": {},
+  "keywords": [
+    "exerussus",
+    "payloads"
+  ],
+  "author": {
+    "name": "Exerussus",
+    "email": "solovyov.production@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/exerussus/payloads.git"
+  }
+}
