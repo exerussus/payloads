@@ -71,6 +71,8 @@ namespace Exerussus.Payloads
 
         public static void Dispose(int id)
         {
+            if (id == 0) return;                             // None / default(Payload) → no-op
+
             int index = (int)((uint)id & IndexMask);
             if ((uint)index >= (uint)_next) return;          // мусорный/чужой id
 
@@ -92,6 +94,9 @@ namespace Exerussus.Payloads
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Set(int id, long uid, long value)
         {
+#if UNITY_EDITOR
+            Debug.Assert(id != 0, "[Payload] Set вызван на Payload.None — запись игнорируется.");
+#endif
             var c = Resolve(id);
             if (c != null) c.Map[uid] = value;
         }
@@ -122,11 +127,20 @@ namespace Exerussus.Payloads
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsAlive(int id) => Resolve(id) != null;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsEmpty(int id)
+        {
+            var c = Resolve(id);
+            return c == null || c.Map.Count == 0;   // мёртвый/протухший контейнер тоже «пуст»
+        }
+
         // ---- internals ----
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Container Resolve(int id)
         {
+            if (id == 0) return null;                        // None / default(Payload) → ранний заворот
+
             int index = (int)((uint)id & IndexMask);
             if ((uint)index >= (uint)_next) return null;
 
@@ -207,6 +221,8 @@ namespace Exerussus.Payloads
 
         public static string Describe(int id)
         {
+            if (id == 0) return "Payload.None";
+
             int index = (int)((uint)id & IndexMask);
             int gen   = (int)(((uint)id >> IndexBits) & GenMask);
 

@@ -2,12 +2,16 @@
 
 namespace Exerussus.Payloads
 {
-    public readonly struct Payload
+    public readonly struct Payload : System.IEquatable<Payload>
     {
         internal readonly int Id;                            // уникальный для живого контейнера
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal Payload(int id) => Id = id;
+
+        // Пустой sentinel. Id == 0 (index:0, gen:0) никогда не выдаётся Create(),
+        // поэтому None и default(Payload) эквивалентны и всегда невалидны/пусты.
+        public static readonly Payload None = new(0);
 
         // ---- lifecycle ----
 
@@ -50,6 +54,25 @@ namespace Exerussus.Payloads
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGet(string key, out long value) => PayloadStore.TryGet(Id, PayloadStore.Hash(key), out value);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsEmpty() => PayloadStore.IsEmpty(Id);
+
+        // ---- equality (по Id; None == default(Payload)) ----
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(Payload other) => Id == other.Id;
+
+        public override bool Equals(object obj) => obj is Payload other && Id == other.Id;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override int GetHashCode() => Id;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(Payload a, Payload b) => a.Id == b.Id;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(Payload a, Payload b) => a.Id != b.Id;
 
         // ---- debug ----
 
